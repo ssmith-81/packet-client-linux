@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 project(PacketClient)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+
+include_directories(/opt/ros/noetic/include /opt/ros/noetic/lib)
+
 add_executable(PacketClient PacketClient.cpp)
-target_link_libraries(PacketClient pthread)
+target_link_libraries(PacketClient pthread -I/opt/ros/noetic/include -L/opt/ros/noetic/lib
+-lroscpp -lrostime -lrosconsole -lroscpp_serialization)
