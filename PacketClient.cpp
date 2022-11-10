@@ -44,6 +44,9 @@ Usage [optional]:
 #include <chrono>
 #include <thread>
 
+#include <ros/ros.h>
+#include <geometry_msgs/PoseStamped.h>
+
 #include <unistd.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -101,8 +104,12 @@ int DataSocket;
 in_addr ServerAddress;
 sockaddr_in HostAddr;
 
+// Global ROS publisher
+ros::Publisher pub;
+geometry_msgs::PoseStamped pose;
+
 // Versioning
-int NatNetVersion[4] = {3, 0, 0, 0};
+int NatNetVersion[4] = {2, 10, 0, 0};
 int ServerVersion[4] = {0, 0, 0, 0};
 
 // Command mode global variables
@@ -184,6 +191,16 @@ void Unpack(char *pData) {
   int minor = NatNetVersion[1];
 
   char *ptr = pData;
+
+  // -----ROS publshing--------
+
+
+  pose.header.stamp = ros::Time::now();
+
+  pose.header.frame_id="/map";
+
+  
+  //----------------------
 
   printf("Begin Packet\n-------\n");
 
@@ -297,6 +314,21 @@ void Unpack(char *pData) {
       printf("ID : %d\n", ID);
       printf("pos: [%3.2f,%3.2f,%3.2f]\n", x, y, z);
       printf("ori: [%3.2f,%3.2f,%3.2f,%3.2f]\n", qx, qy, qz, qw);
+
+      // this publishing location will work for only 1 rigid body
+      pose.pose.position.x=x;
+      pose.pose.position.y=y;
+      pose.pose.position.z=z;
+
+      pose.pose.orientation.x = qx;
+      pose.pose.orientation.y = qy;
+      pose.pose.orientation.z = qz;
+      pose.pose.orientation.w = qw;
+
+      pub.publish(pose);
+          
+          //printf("test",1);
+     // printf("test\n--\n");
 
       // Before NatNet 3.0, marker data was here
       if (major < 3) {
@@ -426,6 +458,8 @@ void Unpack(char *pData) {
           printf("ID : %d\n", ID);
           printf("pos: [%3.2f,%3.2f,%3.2f]\n", x, y, z);
           printf("ori: [%3.2f,%3.2f,%3.2f,%3.2f]\n", qx, qy, qz, qw);
+
+          
 
           // Before NatNet 3.0, marker data was here
           if (major < 3) {
@@ -1117,6 +1151,19 @@ int main(int argc, char *argv[]) {
   in_addr MyAddress{}, MultiCastAddress{};
   int optval = 0x100000;
   socklen_t optval_size = 4;
+
+  //-----------------------------
+  // ROS Section
+  int rate_b = 10; //10 hz
+
+  ros::init(argc, argv, "Mocap");
+
+  ros::NodeHandle nh;
+
+  pub = nh.advertise<geometry_msgs::PoseStamped>("/dronePose",1000);//,1,true);
+
+
+  //----------------------------
 
 
   // ================ Read IP addresses
