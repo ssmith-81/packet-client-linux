@@ -43,7 +43,7 @@ Press `c` to configure, again `c` to confirm, and finally `g` to generate.
 
 ```bash
 make
-./PacketClient
+./PacketClient <Server IP> <Client IP>
 ```
 
 Note that the NatNet protocol version is hard-coded in `PacketClient.cpp`.
