@@ -197,7 +197,7 @@ void Unpack(char *pData) {
 
   pose.header.stamp = ros::Time::now();
 
-  pose.header.frame_id="/map";
+  pose.header.frame_id="map";
 
   
   //----------------------
@@ -315,7 +315,7 @@ void Unpack(char *pData) {
       printf("pos: [%3.2f,%3.2f,%3.2f]\n", x, y, z);
       printf("ori: [%3.2f,%3.2f,%3.2f,%3.2f]\n", qx, qy, qz, qw);
 
-      // this publishing location will work for only 1 rigid body
+      // this publishing location will work for only 1 rigid body (with z-axis up in motive)
       pose.pose.position.x=x;
       pose.pose.position.y=y;
       pose.pose.position.z=z;
@@ -1160,7 +1160,7 @@ int main(int argc, char *argv[]) {
 
   ros::NodeHandle nh;
 
-  pub = nh.advertise<geometry_msgs::PoseStamped>("/dronePose",1000);//,1,true);
+  pub = nh.advertise<geometry_msgs::PoseStamped>("/mavros/vision_pose/pose",1000);//,1,true);
 
 
   //----------------------------
